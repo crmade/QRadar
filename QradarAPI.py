@@ -53,7 +53,7 @@ def getQueryStatus(queryID):
 
 ##################################### MAIN #####################################
 
-#Run query 30,15,5 Minutes search for 1.2.3.4
+#Run query
 jsonResponse = queryQRadarAPI(searchQueryURL,headers)
 
 
