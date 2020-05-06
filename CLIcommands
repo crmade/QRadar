@@ -1,0 +1,26 @@
+Restart Ariel
+/opt/qradar/init/ariel_proxy_server stop/start/restart 
+/opt/qradar/init/ariel_query_server stop/start/restart 
+7.3 and up
+Console
+systemctl status ariel_proxy_server
+systemctl restart ariel_proxy_server
+Managed hosts
+systemctl restart ariel_query_server
+/opt/qradar/support/all_servers.sh "systemctl restart ariel_query_server"
+
+Run command in all servers
+/opt/qradar/support/all_servers.sh 
+-C: includes console
+-k: includes standby devices
+
+Several commands at once
+/opt/qradar/support/all_servers.sh "cd /etc;rm -f localtime;ln -s /usr/share/zoneinfo/Europe/London localtime" 
+  
+Restart qflow
+/opt/qradar/init/qflow restart <instance name> 
+/opt/qradar/init/qflow restart qflow0 
+
+Check for incoming flows
+tail -f  /var/log/qradar.log |egrep "qflow|fps|flows" 
+tail -f  /var/log/qradar.log |egrep "flows|napatech|sent to" 
