@@ -1,0 +1,37 @@
+PSQL Scripts
+
+Get serial number
+psql -U qradar -c "select ip, hostname,  serial from serverhost;"
+
+Offenses information
+psql -U qradar -c "select offense.id, offense.naming_contributions, custom_rule.rule_data from custom_rule,offense where offense.rule_id = custom_rule.id;"
+
+Active offenses by date
+psql -Uqradar -c "select id, severity,username,start_time from offense_view where active_code !='3' and start_time > '1535760000000';"
+
+Select all event types for an specific log source
+psql -Uqradar -c "select dsmevent.devicetypeid,dsmevent.deviceeventid,dsmevent.deviceeventcategory, qidmap.qname,dsmevent.qidmapid,qidmap.id from dsmevent,qidmap where dsmevent.deviceeventcategory like '3Com%' and dsmevent.qidmapid = qidmap.id;"
+
+Search for error in notifications
+psql -Uqradar -c "select payload from notification where (payload like '%[ERROR]%' and creationdate between '2018-06-15 14:59:32' and '2018-06-15 15:29:32')"
+
+
+Get Users
+psql -U qradar -c "SELECT users.username,users.description,users.email, userrole.name as user_role, securityprofile.name as sec_profile from users, userrole,securityprofile WHERE userrole.id=users.role_idsecurityprofile.id=users.sp_id"
+psql -U qradar -c "SELECT users.username,users.description,users.email, userrole.name as user_role, securityprofile.name as sec_profile from users, userrole,securityprofile WHERE userrole.id=users.role_id AND securityprofile.id=users.sp_id"
+
+Get devices by type
+psql -u qradra "select from managedhost where appliancetype='<type number>'"
+
+
+Export Rules
+psql -U qradar -A -c "select rule_data from custom_rule" | grep "^<?xml" | sed -e 's/<notes\/>/<notes><\/notes>/' -e 's/.*<name>\(.*\)<\/name><notes>\(.*\)<\/notes>.*/"\1"\n"\2"/' | sort > all_rules.csv    
+
+Only enabled rules
+psql -U qradar -A -c "select rule_data from custom_rule" | grep "^<?xml" | grep 'enabled="true"' | sed -e 's/<notes\/>/<notes><\/notes>/' -e 's/.*<name>\(.*\)<\/name><notes>\(.*\)<\/notes>.*/"\1"\n"\2"/' | sort > enabled_rules.csv    
+
+Only disabled rules
+psql -U qradar -A -c "select rule_data from custom_rule" | grep "^<?xml" | grep 'enabled="false"' | sed -e 's/<notes\/>/<notes><\/notes>/' -e 's/.*<name>\(.*\)<\/name><notes>\(.*\)<\/notes>.*/"\1"\n"\2"/' | sort > disabled_rules.csv
+
+Check emails on rules
+psql -Uqradar -c "select rule_data from custom_rule where rule_data like '%responses email%'"
