@@ -1,0 +1,25 @@
+Export content using Content Managemt
+
+Export Rules
+/opt/qradar/bin/contentManagement.pl --action export -c 3 -i all -o /store/IBMexport/
+
+Export Reports
+/opt/qradar/bin/contentManagement.pl --action export -c 10 -i all -o /store/IBMexport/ --debug
+
+Reference Sets
+/opt/qradar/bin/contentManagement.pl --action export -c 28 --include-reference-data-elements -i all -o /store/IBMexport/ 
+
+Saved searches
+/opt/qradar/bin/contentManagement.pl --action export -c 1 -i all -o /store/IBMexport/
+
+
+Custom Properties
+/opt/qradar/bin/contentManagement.pl --action export -c 6 -i all -o /store/IBMexport/
+
+Custom QID map entries
+/opt/qradar/bin/contentManagement.pl --action export -c 27 -i all -o /store/IBMexport/
+
+
+Ref:
+https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.1/com.ibm.qradar.doc/r_cmt_commandz_line_parms.html
+https://www.ibm.com/support/knowledgecenter/SS42VS_7.3.1/com.ibm.qradar.doc/c_cmt_export_overview.html
