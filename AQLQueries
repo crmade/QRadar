@@ -1,0 +1,27 @@
+Disk Utilization by EP (last hour)
+select "Hostname",AVG("Value"*100) as StoragePC from events where logsourceid=512 and "Element"='/' and "Metric ID"='DiskUsage' GROUP BY "Hostname" ORDER BY "StoragePC" LAST 1 HOURS
+
+System CPU by EP (last 5 minutes)
+SELECT "Hostname" AS 'Hostname (custom)', MAX("Value") AS 'Value (custom) (Maximum)', UniqueCount("Component Name") AS 'Component Name (custom) (Unique Count)', COUNT(*) AS 'Count' from events where ( "Metric ID"='SystemCPU' AND logSourceId='512' ) GROUP BY "Hostname" order by "Count" desc LIMIT 1000 last 5 minutes
+
+License exceeded (last 15 minutes)
+SELECT "sourceIP" AS 'Source IP', SUM("eventCount") AS 'Event Count (Sum)', COUNT(*) AS 'Count' from events where "deviceType"='147' AND icu4jsearch('exceeding the license', payload) != -1 GROUP BY "sourceIP" order by "Count" desc last 15 minutes
+
+
+Event Rate (EPS) (Average EPS per MH) Last 15 minutes
+SELECT "Parent" AS 'Parent (custom)', AVG("Events per Second Coalesced - Peak 1 Sec") AS 'Events per Second Coalesced - Peak 1 Sec (custom) (Average)', AVG("Events per Second Raw - Peak 1 Sec") AS 'Events per Second Raw - Peak 1 Sec (custom) (Average)', AVG("Events per Second Coalesced - Average 1 Min") AS 'Events per Second Coalesced - Average 1 Min (custom) (Average)', AVG("Events per Second Raw - Average 1 Min") AS 'Events per Second Raw - Average 1 Min (custom) (Average)', COUNT(*) AS 'Count' from events where "deviceType"='147' AND ( icu4jsearch('Events per second', payload) != -1 AND icu4jsearch('StatFilter', payload) != -1 ) GROUP BY "Parent" order by "Count" desc last 15 minutes
+
+Peak Raw Event Max (last 15 minutes) This will display the source IPs responsible of sending those events that contributed to spikes or peaks. 
+SELECT "sourceIP" AS 'Source IP', MAX("Events per Second Raw - Average 1 Min") AS 'Events per Second Raw - Average 1 Min (custom) (Maximum)', COUNT(*) AS 'Count' from events where "deviceType"='147' AND icu4jsearch('Incoming raw event', payload) != -1 GROUP BY "sourceIP" order by "Events per Second Raw - Average 1 Min (custom) (Maximum)" desc last 15 minutes
+
+Store / Unknown events by log source (last 24 hours)
+SELECT logsourcename(logSourceId) AS 'Log Source', UniqueCount(qid) AS 'Event Name (Unique Count)', SUM("eventCount") AS 'Event Count (Sum)', MIN("startTime") AS 'Start Time (Minimum)', UniqueCount(category) AS 'Low Level Category (Unique Count)', COUNT(*) AS 'Count' from events where (category='10001') or (category='10009') GROUP BY logSourceId order by "Event Count (Sum)" desc LIMIT 10 last 24 hours
+
+Store / Unknown events by Event Processor (last 24 hours)
+SELECT "processorId" AS 'Event Processor', UniqueCount(qid) AS 'Event Name (Unique Count)', UniqueCount(logSourceId) AS 'Log Source (Unique Count)', SUM("eventCount") AS 'Event Count (Sum)', MIN("startTime") AS 'Start Time (Minimum)', UniqueCount(category) AS 'Low Level Category (Unique Count)', COUNT(*) AS 'Count' from events where (category='10001') or (category='10009') GROUP BY "processorId" order by "Event Count (Sum)" desc LIMIT 970 last 24 hours
+
+System notifications (last 24 hours)
+select QIDNAME(qid) as 'Event Name',"startTime" as 'Start Time',categoryname(category) as 'Low Level Category',"sourceIP" as 'Source IP',"DroppedEvents" as 'DroppedEvents (custom)' from events where ( "creEventList"='500' AND (qid<'38750007') or (qid>'38750007' and qid<'38750070') or (qid>'38750070' and qid<'38750136') or (qid>'38750136' and qid<'38750137') or (qid>'38750137') ) order by "startTime" desc LIMIT 2147483612 last 24 hours
+
+Top Log sources (last 15 minutes) Keep in mind this is excluding the internal log sources of QRadar 
+SELECT logsourcename(logSourceId) AS 'Log Source', UniqueCount("sourceIP") AS 'Source IP (Unique Count)', UniqueCount("destinationIP") AS 'Destination IP (Unique Count)', UniqueCount("destinationPort") AS 'Destination Port (Unique Count)', UniqueCount(qid) AS 'Event Name (Unique Count)', UniqueCount(category) AS 'Low Level Category (Unique Count)', UniqueCount("protocolId") AS 'Protocol (Unique Count)', UniqueCount("userName") AS 'Username (Unique Count)', MAX("magnitude") AS 'Magnitude (Maximum)', SUM("eventCount") AS 'Event Count (Sum)', COUNT(*) AS 'Count' from events where ( (logSourceId<'64') or (logSourceId>'64' and logSourceId<'66') or (logSourceId>'66' and logSourceId<'67') or (logSourceId>'67' and logSourceId<'362') or (logSourceId>'362' and logSourceId<'512') or (logSourceId>'512') AND "deviceType" != '18' ) GROUP BY logSourceId order by "Event Count (Sum)" desc last 15 minutes
